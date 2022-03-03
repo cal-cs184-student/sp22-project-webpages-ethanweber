@@ -1,7 +1,179 @@
 <html>
-	<head>
-	</head>
-	<body>
-		Project 2 here
-	</body>
+
+<head>
+</head>
+
+<body>
+	Project 2 here
+
+	<h4>Overview</h4>
+	<p>Give a high-level overview of what you have implemented in this assignment. Think about what you have built as a
+		whole. Share your thoughts on what interesting things you have learned from completing this assignment.</p>
+	<h4>Part 1</h4>
+	<ul>
+		<li>Briefly explain de Casteljau's algorithm and how you implemented it in order to evaluate Bezier curves.</li>
+		<li>Take a look at the provided <code>.bzc</code> files and create your own Bezier curve with <strong>6</strong>
+			control points of your choosing. Use this Bezier curve for your screenshots below.</li>
+		<li>Show screenshots of each step / level of the evaluation from the original control points down to the final
+			evaluated point. Press <kbd>E</kbd> to step through. Toggle <kbd>C</kbd> to show the completed Bezier curve
+			as well.</li>
+		<li>Show a screenshot of a slightly different Bezier curve by moving the original control points around and
+			modifying the parameter <span class="katex"><span class="katex-mathml"><math>
+						<semantics>
+							<mrow>
+								<mi>t</mi>
+							</mrow>
+							<annotation encoding="application/x-tex">t</annotation>
+						</semantics>
+					</math></span><span class="katex-html" aria-hidden="true"><span class="strut"
+						style="height:0.61508em;"></span><span class="strut bottom"
+						style="height:0.61508em;vertical-align:0em;"></span><span class="base textstyle uncramped"><span
+							class="mord mathit">t</span></span></span></span> via mouse scrolling.</li>
+	</ul>
+
+	The de Casteljau's algorithm works by iteratively creating points evaluated for a given value t by using linear interpolation. This function is called recursively until there is one point left, which is part of the Bezier curve. Evaluting at all t's will reveal the full Bezier curve.
+
+	Here is my own curve with 6 control points, with a progression of visualizations.
+	<br>
+	<img src="media/p1_0.png" height="100"></img>
+	<img src="media/p1_1.png" height="100"></img>
+	<img src="media/p1_2.png" height="100"></img>
+	<img src="media/p1_3.png" height="100"></img>
+	<img src="media/p1_4.png" height="100"></img>
+	<img src="media/p1_5.png" height="100"></img>
+	<img src="media/p1_6.png" height="100"></img>
+	<br>
+	And, here are screenshots with a slightly different Bezier curve and with different parameter t values via mouse scrolling.
+	<br>
+	<img src="media/p1_t0.png" height="100"></img>
+	<img src="media/p1_t1.png" height="100"></img>
+
+	<h4>Part 2</h4>
+	<ul>
+		<li>Briefly explain how de Casteljau algorithm extends to Bezier surfaces and how you implemented it in order to
+			evaluate Bezier surfaces.</li>
+		<li>Show a screenshot of <code>bez/teapot.bez</code> (<strong>not</strong> <code>.dae</code>) evaluated by your
+			implementation.</li>
+	</ul>
+
+	The de Casteljau algorithm for Bezier surfaces is very similar, but each dimension is computed separately. First, you evaluate the point at u for all vectors of points along the v direction. Then, you run de Casteljau algorithm by evaluating the newly computed vector of points now for the v value. This results in a point evaluated at location u, v. The following is an image of this:
+	<br>
+	<img src="media/p2.png" height="100"></img>
+	<br>
+
+	<h4>Part 3</h4>
+	<ul>
+		<li>Briefly explain how you implemented the area-weighted vertex normals.</li>
+		<li>Show screenshots of <code>dae/teapot.dae</code> (<strong>not</strong> <code>.bez</code>) comparing teapot
+			shading with and without vertex normals. Use <kbd>Q</kbd> to toggle default flat shading and Phong shading.*
+			Briefly explain how you implemented the area-weighted vertex normals.</li>
+		<li>Show screenshots of <code>dae/teapot.dae</code> (<strong>not</strong> <code>.bez</code>) comparing teapot
+			shading with and without vertex normals. Use <kbd>Q</kbd> to toggle default flat shading and Phong shading.
+		</li>
+	</ul>
+
+	I implemented area-weighted vertex normals by traversing around vertices. I use calls to twin(), next(), vertex(), and the position value to get vertex positions for each triangle around a given vertex. I compute the normalize normal vector and the area of each triangle, and I store them in in vectors. Then, I add the do an area-weighted sum to create a final normal vector that is used. I also handle boundary edges in my code but I don't think it's relevant for this assignment.
+
+	Here, I show the teapot with flat shading (left) and with Phong shading using the computer vertices (right):
+	<br>
+	<img src="media/p3_0.png" height="100"></img>
+	<img src="media/p3_1.png" height="100"></img>
+	<br>
+
+
+	<h4>Part 4</h4>
+	<ul>
+		<li>Briefly explain how you implemented the edge flip operation and describe any interesting implementation /
+			debugging tricks you have used.</li>
+		<li>Show screenshots of a mesh before and after some edge flips.</li>
+		<li>Write about your eventful debugging journey, if you have experienced one.</li>
+	</ul>
+
+	I implemented the edge flip operation by following the instructions in the homework. They idea was listing out all the halfedges and then updating them and all their pointers according to the new edge flip. It was helpful to write out the vertex names a, b, c, and d and directional edges like "ab" when refering to the halfedge going from vertex a to vertex b. This made the code easier to write and keep track of what is going on.
+
+	See the following images for some illustrations of edge flips.
+	<br>
+	<img src="media/p4_0.png" height="100"></img>
+	<img src="media/p4_1.png" height="100"></img>
+	<img src="media/p4_2.png" height="100"></img>
+	<img src="media/p4_3.png" height="100"></img>
+	<img src="media/p4_4.png" height="100"></img>
+	<img src="media/p4_5.png" height="100"></img>
+	<br>
+
+	<h4>Part 5</h4>
+	<ul>
+		<li>Briefly explain how you implemented the edge split operation and describe any interesting implementation /
+			debugging tricks you have used.</li>
+		<li>Show screenshots of a mesh before and after some edge splits.</li>
+		<li>Show screenshots of a mesh before and after a combination of both edge splits and edge flips.</li>
+		<li>Write about your eventful debugging journey, if you have experienced one.</li>
+		<li>If you have implemented support for boundary edges, show screenshots of your implementation properly
+			handling split operations on boundary edges.</li>
+	</ul>
+
+	The edge split operation is implemented similar to part 5 for edge flipping but now with more operations because the process is more complicated. Here, we need to add one vertex, add 3 edges (6 halfedges), and 2 new faces. I try to use nice convensions when writing the code to make it readable, although this function is quite tedious in general to write.
+	<br><br>
+	Here are pictures before and after some edge splits, and then we also add edge flips followed by more edge splits. Follow the images sequentially to see how the order of operations applied.
+
+	<br>
+	<img src="media/p5_0.png" height="100"></img>
+	<img src="media/p5_1.png" height="100"></img>
+	<img src="media/p5_2.png" height="100"></img>
+	<img src="media/p5_3.png" height="100"></img>
+	<img src="media/p5_4.png" height="100"></img>
+	<img src="media/p5_5.png" height="100"></img>
+	<br>
+
+	<h4>Part 6</h4>
+	<ul>
+		<li>Briefly explain how you implemented the loop subdivision and describe any interesting implementation /
+			debugging tricks you have used.</li>
+		<li>Take some notes, as well as some screenshots, of your observations on how meshes behave after loop
+			subdivision. What happens to sharp corners and edges? Can you reduce this effect by pre-splitting some
+			edges?</li>
+		<li>Load <code>dae/cube.dae</code>. Perform several iterations of loop subdivision on the cube. Notice that the
+			cube becomes slightly asymmetric after repeated subdivisions. Can you pre-process the cube with edge flips
+			and splits so that the cube subdivides symmetrically? Document these effects and explain why they occur.
+			Also explain how your pre-processing helps alleviate the effects.</li>
+		<li>If you have implemented any extra credit extensions, explain what you did and document how they work with
+			screenshots.</li>
+	</ul>
+
+
+	I implemented the loop subdivision by following the steps in the instructions. First, I went through all the vertices and their neighbors to compute the new positions for the vertices that were not being added. Then, I went through every edge and computed the new position of a vertex for when the edge is split. Then, I perform the splits and modified the splitEdge function to set new vertices and new edges to isNew = true. With the bookkeeping in place, we then flip edges where applicable if one vertex is new and the other is not. Finally, we update the positions for all the vertices.
+
+	Sharp corners and edges become quite smooth after multiple iterations. Here you can see a sequence of subdivisions, starting from none, left to right. You could reduce this affect by updating each face at a time but this would require extra knowledge and bookkeeping for the given objects.
+	<br>
+	<img src="media/p6_0.png" height="100"></img>
+	<img src="media/p6_1.png" height="100"></img>
+	<img src="media/p6_2.png" height="100"></img>
+	<img src="media/p6_3.png" height="100"></img>
+	<br>
+
+	You could preprocess the cube by making sure that the degree of each vertex is the same and symmetric. You can see what happens when you first add the splits, as follows:
+	<br>
+	<img src="media/p6b_0.png" height="100"></img>
+	<img src="media/p6b_1.png" height="100"></img>
+	<img src="media/p6b_2.png" height="100"></img>
+	<br>
+
+	<h4>Part 7 (Optional, Possible Extra Credit)</h4>
+	<ul>
+		<li>Save your best polygon mesh as <code>partsevenmodel.dae</code> in your <code>docs</code> folder and show us
+			a screenshot of the mesh in your write-up.</li>
+		<li>Include a series of screenshots showing your original mesh and your mesh after one and two rounds of
+			subdivision. If you have used custom shaders, include screenshots of your mesh with those shaders applied as
+			well.</li>
+		<li>Describe what you have done to enhance your mesh beyond the simple humanoid mesh described in the tutorial.
+		</li>
+	</ul>
+
+
+	<h4>My questions</h4>
+	Does the ordering of the u, then v matter for Bezier curves? I.e., can you do v, then u, and have it be equivalent?
+
+	Part 4: Why would one triangle look much darker than the others in a "degenerate case" and it still be okay/correct?
+</body>
+
 </html>
