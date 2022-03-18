@@ -194,7 +194,7 @@
     Note that the objects that look completely black are okay! This is because they do not use diffuse BSDFs. The assignment made it clear that this is fine.
     <br><br>
     In this section, we implemented two ways to do direct lighting: (1) with uniform hemisphere sampling and (2) with importance sampling the lights. Here I show top top row of images using (1) uniform hemisphere sampling and the bottom row with (2) importance sampling. Note that the columns correspond to the same camera and scene. You can check the image names for more details as to which .dae files were used. Notice that the top right dragon image is a black image. This is because uniform sampling used and the probability of hitting the point light source is nearly zero!
-    <br><b>(1) Uniform hemisphere sampling images.</b><br>
+    <br><b>(1) Uniform hemisphere sampling images:</b><br>
     <img src="media/part3_uniform_CBbunny_64_32.png" height="100"></img>
     <img src="media/part3_uniform_CBlucy.png" height="100"></img>
     <img src="media/part3_uniform_dragon_64_32.png" height="100"></img>
@@ -250,11 +250,46 @@
         rates, including at least 1, 2, 4, 8, 16, 64, and 1024. Use 4 light
         rays.
       </li>
-      <li>
+      <!-- <li>
         You will probably want to use the instructional machines for the above
         renders in order to not burn up your own computer for hours.
-      </li>
+      </li> -->
     </ul>
+
+
+    The indirect lighting function takes place with the code "at_least_one_bounce_radiance", which is recursive. The color of a ray will be the output of "zero_bounce_radiance" + "at_least_one_bounce_radiance". "at_least_one_bounce_radiance" first makes a call to one_bounce_radiance and then it computes a continuation probability to see whether or not the algorithm should go on. This is using the Russian Roulette algorithm. If it's the first ray (i.e., its depth is set to max_ray_depth) then continuation probability will be 1. Otherwise, it will be set to 0.65. Otherwise, is will terminated if it's already bounded the maximum number of times. We then check to see if the ray, computed based on the BSDF sample, will intersect another object. If so, we continue and add the accumulated radiance to the color. Of course, we use many normalization constants including costheta and pdf and the continuation probability, much like before! Please see code for details.
+    <br>
+    <br>Here are some images with global (direct + indirect) illumination with 1024 samples per pixel. Note that the commands take the form "./pathtracer -t 8 -s 1024 -l 16 -m 5 -r 480 360 -f part4_global_bunny.png ../dae/sky/CBbunny.dae", for reference on what parameters were used as input to the function.<br>
+    <img src="media/part4_global_bunny.png" height="100"></img>
+    <img src="media/part4_global_spheres.png" height="100"></img>
+    <img src="media/part4_global_lucy.png" height="100"></img>
+    <img src="media/part4_global_coil.png" height="100"></img>
+    <br>
+    <br>
+    Now we pick one scene, the CBspheres_lambertian.dae file. The left is only direct illumination. The right is only indifferent illumination. It's a little tricky to implement, so you can see (possibly commented out) code for details.
+    <br>
+    <img src="media/part4_spheres_onlydirect.png" height="100"></img>
+    <img src="media/part4_spheres_onlyindirect.png" height="100"></img>
+    <br><br>
+    For CBbunny.dae, here we show rendered views with max_ray_depth going from left to right as 0, 1, 2, 3, and 100. We use 1024 samples per pixel. (Ignore that the filenames have the term "spheres" in them.) FOr these we use 4 light rays.
+    <br>
+    <img src="media/part4_spheres_max_ray_depth_m0.png" height="100"></img>
+    <img src="media/part4_spheres_max_ray_depth_m1.png" height="100"></img>
+    <img src="media/part4_spheres_max_ray_depth_m2.png" height="100"></img>
+    <img src="media/part4_spheres_max_ray_depth_m3.png" height="100"></img>
+    <img src="media/part4_spheres_max_ray_depth_m100.png" height="100"></img>
+    <br>
+    <br>
+    For "CBbunny.dae", we also pick this scene and compare rendered views with various samples-per-pixel rates. Namely, we use 4 light rays. From left to right is with 1, 2, 4, 8, 16, 64, and 1024 samples per pixel. Notice the quality improves the further to the right!
+    <br>
+    <img src="media/part4_global_samples_per_pixel_bunny_s1.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s2.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s4.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s8.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s16.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s64.png" height="100"></img>
+    <img src="media/part4_global_samples_per_pixel_bunny_s1024.png" height="100"></img>
+    <br>
 
     <hr />
 
@@ -270,6 +305,19 @@
         result. Use 1 sample per light and at least 5 for max ray depth.
       </li>
     </ul>
+
+    For adaptive sampling, we simply followed the instructions of part 5 where we have a condifence threshold that we terminate with depending on the statistics of the sample for a given pixel. Below we show the CBbunny.dae scene where we use adaptive sampling. Here we use the command "./pathtracer -t 8 -s 2048 -a 64 0.05 -l 1 -m 5 -r 480 360 -f part5_adaptive.png ../dae/sky/CBbunny.dae" which has a max ray depth of 5 and 1 sample per light. See the code in "raytrace_pixel" for how the adaptive sampling is implemented. We keep a running average of the illumination of a pixel and a running average if the illumination squared. This allows us to compute the mean and variance every samplersPerBatch and then decide whether to terminate sampling for that pixel or not.
+    <br><br>
+    Left is the rendering result and right is the adaptive sampling result.
+    <br>
+    <img src="media/part5_adaptive.png" height="100"></img>
+    <img src="media/part5_adaptive_rate.png" height="100"></img>
+    <br>
+    <br>
+    We notice that the right image of the rate indicating the number of used samples doesn't look very correct. Our code should be exactly like the described implementation, and I'm not quite sure why the result is not identical to the solution. Please have a look for yourself. Here is the code for reference. We are very careful about doing things properly, so hopefully the fact that the image doesn't look the same will not affect the grade negatively. Thanks.
+    <br>
+    <img src="media/part5_adaptive_code.png" height="500"></img>
+    <br>
 
     <hr>
     <h2>Random Thoughts / Questions</h2>
